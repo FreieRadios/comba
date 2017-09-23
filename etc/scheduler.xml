@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Jobs multiple="true">
+		<job>
+			<time>00:00</time>
+			<until>23:00</until>
+			<job>play_playlist</job>
+			<params>no_stop</params>
+		</job>
+	     <job>
+            <job>start_recording</job>
+            <until>00:00</until>
+            <day>all</day>
+            <time>00:00</time>
+            <params>no_stop</params>
+        </job>
+        <job>
+            <daysolder>4</daysolder>
+            <job>clean_cached</job>
+            <day>1</day>
+            <time>00:03</time>
+            <params></params>
+        </job>
+		<job>
+			<time>01:00</time>
+			<day>all</day>
+			<job>precache</job>
+			<params></params>
+		</job>
+	</Jobs>
+</Config>

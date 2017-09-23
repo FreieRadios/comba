@@ -1,0 +1,74 @@
+#!/bin/bash
+
+comba_owns=(
+     '/var/audio'
+     '/opt/comba/combac.py'
+     '/opt/comba/combas.py'
+     '/opt/comba/combaa.py'
+     '/opt/comba/combaevents.py'
+     '/etc/comba/scheduler.xml'
+     '/opt/comba/soundengine/helpers'
+     '/var/log/comba'
+     '/var/run/comba'
+     '/opt/comba/var/sqlite'
+   )
+
+
+if [ -n "$USERID" ] && [ "${USERID//[0-9]}" = "" ];then
+    echo "Changing combas uid to $USERID"
+    usermod -u $USERID comba
+    for i in ${comba_owns[@]}; do
+       chown -R comba $i;
+    done;
+fi
+
+chown -R comba:liquidsoap /var/log/comba && chown -R comba /opt/comba/web
+
+cd /opt/comba/web
+/usr/bin/mongod --smallfiles &
+
+COUNTER=0
+while !(nc -z localhost 27017) && [[ $COUNTER -lt 60 ]] ; do
+    sleep 2
+    let COUNTER+=2
+    echo "Waiting for mongo to initialize... ($COUNTER seconds so far)"
+done
+
+echo "processing migrations"
+python manage.py makemigrations --noinput
+python manage.py migrate --noinput
+echo "collecting statics"
+python manage.py collectstatic --noinput
+chown comba /var/log/comba/web.log && chown -R comba /opt/comba/web
+chown -R comba:liquidsoap /opt/comba/var
+if [ "$COMBA_WEB_ADMIN" != "" ] && [ "$COMBA_WEB_ADMIN_PASSWORD" != "" ] && [ ! -f /var/comba/adminset ]; then
+    echo "create django user object"
+	mkdir -p /var/comba/
+	touch /var/comba/adminset
+
+fi
+
+echo "create audio folders"
+
+audio_folders=(
+     'fallback'
+     'archive'
+     'jingles'
+     'preprod'
+     'rec'
+   )
+for folder in ${audio_folders[@]}; do
+       mkdir -p "/var/audio/$folder"
+       chown -R comba:liquidsoap "/var/audio/$folder"
+done;
+
+
+python /opt/comba/tools/initdb.py
+
+kill -9 $(ps -ax | grep /usr/bin/mongod | grep -v grep | awk '{ print $1 }');
+
+envsubst < /etc/ssmtp/ssmtp.template > /etc/ssmtp/ssmtp.conf
+envsubst < /etc/comba/comba.template > /etc/comba/comba.ini
+
+/usr/bin/supervisord -n
+exit 0
