@@ -14,21 +14,28 @@ docker run --name comba --privileged comba/comba -d
 
 ## Environment Variables
 
+    USERID ""
+    
     COMBA_WEB_ADMIN "comba"
     COMBA_WEB_ADMIN_PASSWORD "comba"
-    MAILHUB "mail.server.tld"
-    MAILUSER "itsyou"
-    MAILPASSWORD "secret"
-    MAILUSETLS "YES"
-    MAILUSESTARTTLS "YES"
-
-    ALSA_BUFFER "16384"
     ADMINMAILTO "admin@mydomain.tld"
     ADMINMAILFROM "comba@mydomain.tld"
+    
+    ALSA_BUFFER "16384"
     CALENDERURL "http://your.jimtawl.calender.tld/index.php?option=com_jimtawl&view=calendar&format=json&from=#datefrom#&to=#dateto#"
     RECORDERINPUT "soundcard"
     RECORDERDEVICE "default"
     PLAYERDEVICE "default"    
+    
+    MAILHUB "mail.server.tld"
+    MAILUSER "itsyou"
+    MAILPASSWORD "secret"
+    MAILUSETLS "YES"
+    MAILUSESTARTTLS "YES"    
+
+### System
+
+* **USERID**: map host user id to user comba, to have access to files in /var/audio     
 
 ### Webinterface
 
@@ -38,6 +45,8 @@ docker run --name comba --privileged comba/comba -d
 ### Programme Calender Service
 
 * **CALENDERURL**: Url of webservice providing your radio programme calendar - usually jimtawl
+
+**Attention:** Comba will not work without a valid calendar web service 
 
 ### Sound Settings 
 
@@ -68,6 +77,7 @@ docker run --name comba --privileged comba/comba -d
     environment:
       COMBA_WEB_ADMIN: comba
       COMBA_WEB_ADMIN_PASSWORD: comba123
+      CALENDERURL "http://my.real.jimtwawl.calender.tld/index.php?option=com_jimtawl&view=calendar&format=json&from=#datefrom#&to=#dateto#"
     ulimits:
       nofile:
         hard: 40000
