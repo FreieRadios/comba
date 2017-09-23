@@ -47,7 +47,7 @@ docker run --name comba --privileged comba/comba -d
 * **RECORDERINPUT**: Usually "soundcard" - you may also record from a stream
 
 
-###Mail service (via ssmtp)
+### Mail service (via ssmtp)
  
 * **MAILHUB**: your mailserver host
 * **MAILUSER**: email account username  
