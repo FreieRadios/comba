@@ -93,7 +93,7 @@ Note: To get full control of the audio storage for your local user, you can use 
 
 ## Custom plugins volume
  
-```mkdir -p  /opt/comba-docker/plugins-custom```  
+```mkdir -p  /var/comba/plugins-custom```  
 
 
 ## Docker Compose example
@@ -114,7 +114,8 @@ Note: To get full control of the audio storage for your local user, you can use 
           /var/comba/sqlite:/opt/comba/var/sqlite          
           /var/comba/mongo-data:/data
           /var/comba/redis-data:/var/redis/data
-          /var/comba/audio:/var/audio          
+          /var/comba/audio:/var/audio      
+          /var/comba/plugins-custom:/opt/comba/plugins/custom               
         ulimits:
           nofile:
             hard: 40000
