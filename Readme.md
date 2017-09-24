@@ -14,6 +14,7 @@ docker run --name comba --privileged comba/comba -d
 
 ## Environment Variables
 
+    
     USERID ""
     
     COMBA_WEB_ADMIN "comba"
@@ -67,27 +68,78 @@ docker run --name comba --privileged comba/comba -d
 * **ADMINMAILFROM**: From address for service mails
 
 
+## Making databases and audio storage persistant
+  
+```mkdir -p /var/comba/sqlite && mkdir -p /var/comba/mongo-data/db && mkdir -p /var/comba/redis-data && mkdir -p /var/comba/audio```
+
+User of sqlite directory and file must be user comba inside the docker container
+   
+So you can chown this way:
+
+1. Detect the container name or id, e.g ```combacontainer=$(docker ps | grep comba | awk '{ print $1 }') ```
+   
+2. Get comba uid from container and chown the directory /var/comba/sqlite
+   
+```bash
+combauid=$(docker exec -it $combacontainer id comba | awk '{ print $1 }' | sed -n  "s/^uid=\(.*\)(.*/\1/p") \
+&& chown -R $combauid /var/comba/sqlite
+``` 
+
+Note: To get full control of the audio storage for your local user, you can use the environment variable $USERID
+      
+      chown  localuser /var/comba/sqlite && chown  localuser /var/comba/audio  
+ 
+ 
+
+## Custom plugins volume
+ 
+```mkdir -p  /opt/comba-docker/plugins-custom```  
+
+
 ## Docker Compose example
 
     version: '2'
     services:
       comba:
-      privileged: true
-    image: comba/comba
-    environment:
-      COMBA_WEB_ADMIN: comba
-      COMBA_WEB_ADMIN_PASSWORD: comba123
-      CALENDERURL "http://my.real.jimtwawl.calender.tld/index.php?option=com_jimtawl&view=calendar&format=json&from=#datefrom#&to=#dateto#"
-    ulimits:
-      nofile:
-        hard: 40000
-        soft: 20000
-    volumes:
-    - ./etc/comba:/etc/comba
-    - ./sqlite:/opt/comba/var/sqlite
-    - ./mongo-data:/data
-    - ./redis-data:/var/redis/data/
-    - /srv/comba/audio:/var/audio
-    - ./plugins-custom:/opt/comba/plugins/custom    
-    ports:
-    - 8088:8000/tcp
+        privileged: true
+        image: comba/comba
+        environment:
+          # link to the calendar service below: 
+          CALENDERURL: http://calendar/index.php?option=com_jimtawl&view=calendar&format=json&from=#datefrom#&to=#dateto#
+          COMBA_WEB_ADMIN: comba-admin
+          COMBA_WEB_ADMIN_PASSWORD: comba-secret
+          # assumed your local user has uid 1022 and he owns /var/comba/audio and  /var/comba/sqlite on docker host
+          USERID: 1022
+        volumes:
+          /var/comba/sqlite:/opt/comba/var/sqlite          
+          /var/comba/mongo-data:/data
+          /var/comba/redis-data:/var/redis/data
+          /var/comba/audio:/var/audio          
+        ulimits:
+          nofile:
+            hard: 40000
+            soft: 20000
+        ports:
+        - 80:8000/tcp
+
+      calendar:
+        image: comba/jimtawl
+        environment:
+          JOOMLA_ADMINMAIL: admin@somewhere.tld
+          JOOMLA_DB_HOST: joomladb
+          JOOMLA_DB_NAME: jimtawl
+          JOOMLA_DB_PASSWORD: secret
+          JOOMLA_DB_USER: root
+          JOOMLA_ADMIN_USERNAME: combaadmin
+          JOOMLA_ADMIN_PASSWORD: comba123
+          LOAD_JIMTAWL_SAMPLEDATA: "Yes"          
+        links:
+        - joomladb
+        ports:
+        - 81:80/tcp
+                        
+      joomladb:
+        image: mariadb
+        environment:
+          MYSQL_DATABASE: jimtawl
+          MYSQL_ROOT_PASSWORD: secret
