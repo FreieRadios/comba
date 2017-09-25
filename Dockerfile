@@ -37,7 +37,8 @@ RUN apt-get update && apt-get install -y \
     netcat \
     ssmtp \
     mailutils \
-    gettext-base
+    gettext-base \
+    tzdata
 
 
 
@@ -161,6 +162,7 @@ ENV WEBSERVICEPORT "8000"
 ENV COMBA_CONTROLLER_PORT "9099"
 
 ENV USERID ""
+ENV COMBA_TIMEZONE Europe/Berlin
 
 EXPOSE 8000 9099
 ENTRYPOINT /usr/local/bin/entrypoint

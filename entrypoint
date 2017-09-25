@@ -22,6 +22,10 @@ if [ -n "$USERID" ] && [ "${USERID//[0-9]}" = "" ];then
     done;
 fi
 
+echo $COMBA_TIMEZONE > /etc/timezone
+dpkg-reconfigure -f noninteractive tzdata
+echo "Container timezone set to: $COMBA_TIMEZONE"
+
 chown -R comba:liquidsoap /var/log/comba && chown -R comba /opt/comba/web
 
 cd /opt/comba/web
