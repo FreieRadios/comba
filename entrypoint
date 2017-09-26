@@ -22,10 +22,13 @@ if [ -n "$USERID" ] && [ "${USERID//[0-9]}" = "" ];then
     done;
 fi
 
-echo $COMBA_TIMEZONE > /etc/timezone
-dpkg-reconfigure -f noninteractive tzdata
-echo "Container timezone set to: $COMBA_TIMEZONE"
 
+if [ -f /usr/share/zoneinfo/$COMBA_TIMEZONE ]; then
+    cp /usr/share/zoneinfo/$COMBA_TIMEZONE /etc/localtime && echo $COMBA_TIMEZONE > /etc/timezone
+    echo "Container timezone set to: $COMBA_TIMEZONE"
+    dpkg-reconfigure -f noninteractive tzdata
+fi
+echo $TZ
 chown -R comba:liquidsoap /var/log/comba && chown -R comba /opt/comba/web
 
 cd /opt/comba/web
@@ -36,6 +39,14 @@ while !(nc -z localhost 27017) && [[ $COUNTER -lt 60 ]] ; do
     sleep 2
     let COUNTER+=2
     echo "Waiting for mongo to initialize... ($COUNTER seconds so far)"
+done
+
+/usr/bin/redis-server /etc/redis/redis.conf &
+COUNTER=0
+while !(nc -z localhost 6379) && [[ $COUNTER -lt 60 ]] ; do
+    sleep 2
+    let COUNTER+=2
+    echo "Waiting for redis to initialize... ($COUNTER seconds so far)"
 done
 
 echo "processing migrations"
@@ -70,6 +81,8 @@ done;
 python /opt/comba/tools/initdb.py
 
 kill -9 $(ps -ax | grep /usr/bin/mongod | grep -v grep | awk '{ print $1 }');
+
+kill -9 $(ps -ax | grep /usr/bin/redis-server | grep -v grep | awk '{ print $1 }');
 
 envsubst < /etc/ssmtp/ssmtp.template > /etc/ssmtp/ssmtp.conf
 envsubst < /etc/comba/comba.template > /etc/comba/comba.ini
