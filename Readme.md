@@ -111,11 +111,11 @@ Note: To get full control of the audio storage for your local user, you can use 
           # assumed your local user has uid 1022 and he owns /var/comba/audio and  /var/comba/sqlite on docker host
           USERID: 1022
         volumes:
-          /var/comba/sqlite:/opt/comba/var/sqlite:rw          
-          /var/comba/mongo-data:/data:rw
-          /var/comba/redis-data:/var/redis/data:rw
-          /var/comba/audio:/var/audio:rw      
-          /var/comba/plugins-custom:/opt/comba/plugins/custom               
+        - /var/comba/sqlite:/opt/comba/var/sqlite:rw
+        - /var/comba/mongo-data:/data:rw
+        - /var/comba/redis-data:/var/redis/data:rw
+        - /var/comba/audio:/var/audio:rw      
+        - /var/comba/plugins-custom:/opt/comba/plugins/custom               
         ulimits:
           nofile:
             hard: 40000
