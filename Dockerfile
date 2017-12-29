@@ -97,7 +97,6 @@ RUN LIQUIDGROUP=$(cat /etc/init.d/liquidsoap | grep "group="); \
 		[ ! -d /var/log/comba ] && mkdir /var/log/comba && chown -R comba:$LIQUIDGROUP /var/log/comba && chmod 775 /var/log/comba; \
 		[ ! -d /var/log/pyweb ] && mkdir /var/log/pyweb && touch /var/log/pyweb/pyweb.log && chown -R comba:$LIQUIDGROUP /var/log/pyweb && chmod 775 /var/log/pyweb; \
 		[ ! -d /usr/lib/python2.7/config ] && find /usr/lib/python2.7/ -maxdepth 1 -type d -name "config*" -print | head -1| xargs -i -n1 ln -s {} /usr/lib/python2.7/config; \
-
 		[ ! -d /tmp/comba ] && mkdir /tmp/comba; \
 		if [ ! -f /usr/bin/combapasswd ]; then cd  /tmp/comba && python /usr/share/doc/python2.7/examples/Tools/freeze/freeze.py /opt/comba/tools/combapasswd && make && cp combapasswd /usr/bin; fi; \
 		if [ ! -f /usr/bin/combawhitelist ]; then cd  /tmp/comba && export PYTHONPATH=$PYTHONPATH:/opt/comba/libraries && python /usr/share/doc/python2.7/examples/Tools/freeze/freeze.py /opt/comba/tools/combawhitelist /opt/comba/libraries/comba_lib/security/whitelist.py && make && cp combawhitelist /usr/bin; fi;\
@@ -118,8 +117,7 @@ RUN [ -d /tmp/comba ] && rm -Rf /tmp/comba; \
 RUN mkdir -p /var/log/comba/
 RUN mkdir -p /opt/comba/var/sqlite && chown comba /opt/comba/var/sqlite
 
-RUN pip install --upgrade pip && \
-    pip install -r /opt/comba/data/requirements.txt && \
+RUN pip install --upgrade pip && pip install -r /opt/comba/data/requirements.txt && \
     pip install "pyzmq>=16.0.2" --upgrade --install-option="--zmq=bundled"
 
 ADD etc/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
