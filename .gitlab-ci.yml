@@ -7,7 +7,10 @@ variables:
   CONTAINER_IMAGE: docker.janguo.de/comba
   DOCKER_DRIVER: overlay
   GIT_SUBMODULE_STRATEGY: normal
-  
+
+cache:
+  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+
 before_script:
   - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD docker.janguo.de
 
