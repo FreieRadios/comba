@@ -50,8 +50,8 @@ RUN  echo "deb http://download.opensuse.org/repositories/network:/messaging:/zer
 RUN wget -O - http://tools.janguo.de/repos/apt/tools.janguo.de.key|apt-key add -
 
 RUN cd /opt/ && rm -Rf comba && \
-    git clone https://gitlab.janguo.de/comba/comba_main.git comba && cd /opt/comba &&  \
-    git fetch origin;git reset --hard HEAD
+    git clone https://gitlab.janguo.de/comba/comba_main.git comba && \
+    cd /opt/comba
 
 RUN cd /opt/comba &&  \
     sed -i "s/:/\//g" .gitmodules
