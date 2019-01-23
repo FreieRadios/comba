@@ -47,7 +47,7 @@ RUN  echo "deb http://download.opensuse.org/repositories/network:/messaging:/zer
     apt-get install -y \
     libzmq3-dev
 
-RUN wget -O - http://tools.janguo.de/repos/apt/tools.janguo.de.key|apt-key add -
+# RUN wget -O - http://tools.janguo.de/repos/apt/tools.janguo.de.key|apt-key add -
 
 RUN cd /opt/ && rm -Rf comba && \
     git clone https://gitlab.janguo.de/comba/comba_main.git comba && \
