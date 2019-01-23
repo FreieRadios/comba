@@ -1,0 +1,22 @@
+image: docker:stable
+
+services:
+  - docker:dind
+
+variables:
+  CONTAINER_IMAGE: docker.janguo.de/comba
+  DOCKER_DRIVER: overlay
+  GIT_SUBMODULE_STRATEGY: normal
+  
+before_script:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD docker.janguo.de
+
+build:
+  stage: build
+  only:
+    - tags
+  script:
+   
+    - docker build --cache-from $CONTAINER_IMAGE:latest --tag $CONTAINER_IMAGE:$CI_BUILD_REF --tag $CONTAINER_IMAGE:latest .
+    - docker push $CONTAINER_IMAGE:$CI_BUILD_REF
+    - docker push $CONTAINER_IMAGE:latest
