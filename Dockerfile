@@ -116,7 +116,7 @@ RUN [ -d /tmp/comba ] && rm -Rf /tmp/comba; \
 RUN mkdir -p /var/log/comba/
 RUN mkdir -p /opt/comba/var/sqlite && chown comba /opt/comba/var/sqlite
 
-RUN python -m pip install --upgrade pip && pip install -r /opt/comba/data/requirements.txt && \
+RUN python -m pip install --upgrade pip &&  pip install --upgrade setuptools && pip install -r /opt/comba/data/requirements.txt && \
     pip install "pyzmq>=16.0.2" --upgrade --install-option="--zmq=bundled"
 
 ADD etc/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
